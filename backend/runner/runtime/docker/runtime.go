@@ -22,6 +22,11 @@ type Config struct {
 	PullStrategy models.DockerPullStrategy
 	ShellOrNil   *string
 	Services     []RuntimeServiceConfig
+	// DockerInDocker determines whether the host's Docker socket (or named pipe on Windows) is
+	// bind-mounted into the job's container. This grants the container control over the host
+	// Docker daemon (equivalent to host root), so it must be explicitly requested by the job
+	// rather than being mounted unconditionally.
+	DockerInDocker bool
 }
 
 type RuntimeServiceConfig struct {
@@ -247,8 +252,12 @@ func (r *Runtime) prepareWindowsContainerConfig(ctx context.Context) (*runtimeCo
 	binds := []string{
 		fmt.Sprintf("%s:%s:rw", r.config.WorkspaceDir, guestWorkingDir),
 		fmt.Sprintf("%s:%s:ro", r.config.StagingDir, guestStagingDir),
-		// Windows containers only run on Windows, so use the Windows pipe syntax
-		"\\\\.\\pipe\\docker_engine:\\\\.\\pipe\\docker_engine",
+	}
+	if r.config.DockerInDocker {
+		// Only expose the host's Docker engine to the job container when explicitly requested:
+		// this grants the container control over the host Docker daemon, equivalent to host root.
+		// Windows containers only run on Windows, so use the Windows pipe syntax.
+		binds = append(binds, "\\\\.\\pipe\\docker_engine:\\\\.\\pipe\\docker_engine")
 	}
 	return &runtimeContainerConfig{
 		Name:                util.EscapeFileName(r.config.RuntimeID),
@@ -277,9 +286,13 @@ func (r *Runtime) prepareLinuxContainerConfig(ctx context.Context) (*runtimeCont
 	binds := []string{
 		fmt.Sprintf("%s:%s:rw", r.config.WorkspaceDir, guestWorkingDir),
 		fmt.Sprintf("%s:%s:ro", r.config.StagingDir, guestStagingDir),
+	}
+	if r.config.DockerInDocker {
+		// Only expose the host's Docker engine to the job container when explicitly requested:
+		// this grants the container control over the host Docker daemon, equivalent to host root.
 		// Linux containers run natively on Linux, and in a Linux VM on Windows and macOS,
-		// so we can always refer to the Linux socket path here
-		"/var/run/docker.sock:/var/run/docker.sock",
+		// so we can always refer to the Linux socket path here.
+		binds = append(binds, "/var/run/docker.sock:/var/run/docker.sock")
 	}
 	return &runtimeContainerConfig{
 		Name:                r.config.RuntimeID,

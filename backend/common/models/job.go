@@ -111,6 +111,11 @@ type JobDefinitionData struct {
 	DockerAuth *DockerAuth `json:"docker_auth" db:"job_docker_auth"`
 	// DockerShell is the path to the shell to use to run build scripts with inside the container.
 	DockerShell *string `json:"docker_shell" db:"job_docker_shell"`
+	// DockerInDocker determines whether the host's Docker socket is made available inside the job's
+	// container, allowing the job to build/run/push Docker images of its own. This grants the job
+	// container the ability to control the host Docker daemon (equivalent to host root), so it
+	// defaults to false and must be explicitly requested by the job.
+	DockerInDocker bool `json:"docker_in_docker" db:"job_docker_in_docker"`
 	// StepExecution determines how the runner will execute steps within this job.
 	StepExecution StepExecution `json:"step_execution" db:"job_step_execution"`
 	// FingerprintCommands contains zero or more shell commands to execute to generate a unique fingerprint for the job.

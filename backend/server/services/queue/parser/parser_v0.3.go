@@ -168,6 +168,19 @@ func (s *buildDefinitionParserV03) parseJob(raw map[string]interface{}) (*models
 			return nil, err
 		}
 		job.DockerAuth = auth
+
+		rDockerInDocker, ok := docker["docker_in_docker"]
+		if ok {
+			// All scalar values have already been normalized to strings by normalizeMapValues().
+			str, ok := rDockerInDocker.(string)
+			if !ok {
+				return nil, errors.Errorf("Expected job 'docker.docker_in_docker' field to be a bool but found: %T", rDockerInDocker)
+			}
+			job.DockerInDocker, err = strconv.ParseBool(str)
+			if err != nil {
+				return nil, errors.Errorf("Expected job 'docker.docker_in_docker' field to be a bool but found: %q", str)
+			}
+		}
 	}
 
 	rStepExecution := raw["step_execution"]

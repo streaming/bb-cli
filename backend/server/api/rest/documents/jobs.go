@@ -108,7 +108,7 @@ func MakeJob(rctx routes.RequestContext, job *models.Job) *Job {
 		Services:            MakeServices(job.Services),
 		Type:                job.Type,
 		RunsOn:              job.RunsOn,
-		DockerConfig:        MakeDockerConfig(job.DockerImage, job.DockerImagePullStrategy, job.DockerAuth, job.DockerShell),
+		DockerConfig:        MakeDockerConfig(job.DockerImage, job.DockerImagePullStrategy, job.DockerAuth, job.DockerShell, job.DockerInDocker),
 		StepExecution:       job.StepExecution,
 		FingerprintCommands: job.FingerprintCommands,
 		ArtifactDefinitions: MakeArtifactDefinitions(job.ArtifactDefinitions),
