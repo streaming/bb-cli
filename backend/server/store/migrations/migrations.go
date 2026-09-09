@@ -706,4 +706,10 @@ var BuildBeaverServerMigrations = MigrationSet{
 					jobs_depend_on_jobs_target_job_id);`,
 		DownSQL: `DROP INDEX jobs_depend_on_jobs_target_job_name_index; `,
 	},
+	{
+		SequenceNumber: 68,
+		Name:           "add_job_docker_in_docker",
+		UpSQL:          `ALTER TABLE jobs ADD COLUMN job_docker_in_docker bool NOT NULL default FALSE;`,
+		DownSQL:        `ALTER TABLE jobs DROP COLUMN job_docker_in_docker;`,
+	},
 }

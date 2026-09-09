@@ -25,9 +25,12 @@ type DockerConfig struct {
 	AWSAuth *DockerAWSAuth `json:"aws_auth,omitempty"`
 	// Shell is the path to the shell to use to run build scripts with inside the container, or nil for the default.
 	Shell *string `json:"shell,omitempty"`
+	// DockerInDocker determines whether the host's Docker socket is made available inside the job's
+	// container. Defaults to false; must be explicitly requested by the job.
+	DockerInDocker bool `json:"docker_in_docker,omitempty"`
 }
 
-func MakeDockerConfig(image string, pull models.DockerPullStrategy, auth *models.DockerAuth, shell *string) *DockerConfig {
+func MakeDockerConfig(image string, pull models.DockerPullStrategy, auth *models.DockerAuth, shell *string, dockerInDocker bool) *DockerConfig {
 	var basicAuth *DockerBasicAuth
 	if auth != nil && auth.Basic != nil {
 		basicAuth = &DockerBasicAuth{}
@@ -56,10 +59,11 @@ func MakeDockerConfig(image string, pull models.DockerPullStrategy, auth *models
 		}
 	}
 	return &DockerConfig{
-		Image:     image,
-		Pull:      pull,
-		BasicAuth: basicAuth,
-		AWSAuth:   awsAuth,
-		Shell:     shell,
+		Image:          image,
+		Pull:           pull,
+		BasicAuth:      basicAuth,
+		AWSAuth:        awsAuth,
+		Shell:          shell,
+		DockerInDocker: dockerInDocker,
 	}
 }

@@ -15,7 +15,7 @@ func MakeService(service *models.Service) *Service {
 	return &Service{
 		Name:         service.Name,
 		Environment:  MakeEnvVars(service.Environment),
-		DockerConfig: MakeDockerConfig(service.DockerImage, models.DockerPullStrategyDefault, service.DockerRegistryAuthentication, nil),
+		DockerConfig: MakeDockerConfig(service.DockerImage, models.DockerPullStrategyDefault, service.DockerRegistryAuthentication, nil, false),
 	}
 }
 func MakeServices(services []*models.Service) []*Service {

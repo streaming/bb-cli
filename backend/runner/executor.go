@@ -482,11 +482,12 @@ func (b *Executor) prepareRuntime(ctx *JobBuildContext) error {
 			return fmt.Errorf("error making docker auth for job: %w", err)
 		}
 		config := docker.Config{
-			Config:       baseConfig,
-			ImageURI:     job.DockerConfig.Image,
-			AuthOrNil:    jobDockerAuth,
-			PullStrategy: job.DockerConfig.Pull,
-			ShellOrNil:   job.DockerConfig.Shell,
+			Config:         baseConfig,
+			ImageURI:       job.DockerConfig.Image,
+			AuthOrNil:      jobDockerAuth,
+			PullStrategy:   job.DockerConfig.Pull,
+			ShellOrNil:     job.DockerConfig.Shell,
+			DockerInDocker: job.DockerConfig.DockerInDocker,
 		}
 		for _, service := range job.Services {
 			serviceDockerAuth, err := b.getDockerAuth(service.DockerConfig)
